@@ -6,6 +6,8 @@ import popcorn from "./assets/popcorn.svg"
 function App() {
   const [count, setCount] = useState(0)
 
+
+
   return (
     <>
       <div id="main-page" >
@@ -17,9 +19,9 @@ function App() {
         <div id="questions">
           <h4 class="questions">What's your favorite movie and why?</h4>
           <textarea class="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>
-          <h4 class="questions">What's your favorite movie and why?</h4>
+          <h4 class="questions">Are you in the mood for something new or classic?</h4>
           <textarea class="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>
-          <h4 class="questions">What's your favorite movie and why?</h4>
+          <h4 class="questions">Do you wanna have fun or do you want something serious?</h4>
           <textarea class="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>
           <button id="front-page-button">Let's Go</button>
         </div>
