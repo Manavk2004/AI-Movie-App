@@ -9,6 +9,30 @@ function App() {
   const [type, setType] = useState("")
 
 
+
+
+
+
+
+  // //use effects for testing
+
+  // useEffect(()=>{
+  //   console.log(`Here is the favMovie: ${favMovie}`)
+  // }, [favMovie])
+
+  // useEffect(()=>{
+  //   console.log(`Here is the mood: ${mood}`)
+  // },[mood])
+
+  // useEffect(()=>{
+  //   console.log(`Here is the type: ${type}`)
+  // },[type])
+
+  
+
+/*--------------------------------------------SEPARATION BETWEEN VECTOR EMBEDDINGS AND REST OF CODE------------------------------------------------------------------------------------------------------------*/
+
+
 //Vector embedding initailization utilizing openAI
   async function main(){
     const movies = await movieSelections()
@@ -17,8 +41,6 @@ function App() {
     await vectorEmbeddings(movies)
     console.log("done")
   }
-
-  main()
 
   async function movieSelections(){
     const data = await fetch("./movies.txt")
@@ -56,24 +78,26 @@ function App() {
     
   }
 
+/*--------------------------------------------SEPARATION BETWEEN VECTOR EMBEDDINGS AND REST OF CODE------------------------------------------------------------------------------------------------------------*/
 
 
+  async function inputEmbeddings(states){
+    const input = states.join(",")
+    const embedding = await openai.embeddings.create({
+      model: "text-embedding-ada-002", 
+      input,
+    })
 
-  // //use effects for testing
+    const actualEmbedding = embedding.data[0].embedding
 
-  // useEffect(()=>{
-  //   console.log(`Here is the favMovie: ${favMovie}`)
-  // }, [favMovie])
+    const { data } = await supabase.rpc('match_movieapp', {
+      query_embedding: actualEmbedding, 
+      match_threshold: 0.5,
+      match_count: 1,
+    })
 
-  // useEffect(()=>{
-  //   console.log(`Here is the mood: ${mood}`)
-  // },[mood])
-
-  // useEffect(()=>{
-  //   console.log(`Here is the type: ${type}`)
-  // },[type])
-
-  
+    console.log(data)
+  }
 
 
 
@@ -92,7 +116,7 @@ function App() {
           <textarea onChange={(e)=>setMood(e.target.value)} className="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>
           <h4 className="questions">Do you wanna have fun or do you want something serious?</h4>
           <textarea onChange={(e)=>setType(e.target.value)} className="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>
-          <button id="front-page-button">Let's Go</button>
+          <button onClick={()=>inputEmbeddings([favMovie, mood, type])} id="front-page-button">Let's Go</button>
         </div>
       </div>
     </>
