@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import popcorn from "./assets/popcorn.svg"
+import { CharacterTextSplitter } from "langchain/text_splitter"
+import { openai, supabase } from "./config.jsx"
 
 function App() {
   const [favMovie, setFavMovie] = useState("")
@@ -9,26 +9,67 @@ function App() {
   const [type, setType] = useState("")
 
 
-  function favoriteMove(){
+//Vector embedding initailization utilizing openAI
+  async function main(){
+    const movies = await movieSelections()
+    console.log(movies)
+    console.log("first await done")
+    await vectorEmbeddings(movies)
+    console.log("done")
+  }
 
+  main()
+
+  async function movieSelections(){
+    const data = await fetch("./movies.txt")
+      .then(res => res.text())
+      .then(data => data)
+
+
+    const textSplitter = new CharacterTextSplitter({
+      chunkSize: 1000,
+      chunkOverlap: 200
+    })
+
+    const movies = await textSplitter.createDocuments([data])
+
+    return movies
+  }
+
+  async function vectorEmbeddings(movies){
+      movies.map( async(movie) =>{
+        const embeddingResponse = await openai.embeddings.create({
+          model: "text-embedding-ada-002",
+          input: movie.pageContent
+        })
+
+
+        const data = {
+          content: movie.pageContent,
+          embedding: embeddingResponse.data[0].embedding
+        }
+
+        await supabase.from('movieapp').insert(data)
+    })
+    
   }
 
 
 
 
-  //use effects for testing
+  // //use effects for testing
 
-  useEffect(()=>{
-    console.log(`Here is the favMovie: ${favMovie}`)
-  }, [favMovie])
+  // useEffect(()=>{
+  //   console.log(`Here is the favMovie: ${favMovie}`)
+  // }, [favMovie])
 
-  useEffect(()=>{
-    console.log(`Here is the mood: ${mood}`)
-  },[mood])
+  // useEffect(()=>{
+  //   console.log(`Here is the mood: ${mood}`)
+  // },[mood])
 
-  useEffect(()=>{
-    console.log(`Here is the type: ${type}`)
-  },[type])
+  // useEffect(()=>{
+  //   console.log(`Here is the type: ${type}`)
+  // },[type])
 
   
 
@@ -43,7 +84,7 @@ function App() {
         </div>
 
         <div id="questions">
-          <h4 class="questions">What's your favorite movie and why?</h4>
+          <h4 className="questions">What's your favorite movie and why?</h4>
           <textarea onChange={(e)=>setFavMovie(e.target.value)} className="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>
           <h4 className="questions">Are you in the mood for something new or classic?</h4>
           <textarea onChange={(e)=>setMood(e.target.value)} className="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>

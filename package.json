@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.50.3",
+    "langchain": "^0.3.29",
+    "openai": "^5.8.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },
