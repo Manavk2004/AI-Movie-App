@@ -81,6 +81,14 @@ function App() {
 /*--------------------------------------------SEPARATION BETWEEN VECTOR EMBEDDINGS AND REST OF CODE------------------------------------------------------------------------------------------------------------*/
 
 
+  //Open ai chat completions
+
+  let chatMessages = ([{
+    role: "system",
+    content: 
+      "You are an ethusiast of movies and your goal is to recommend the most similar movie based on the input given. You will be given several movies and their descriptions, and then the user inputs about what they favorite movie is, what they are in the modd for, and whether they want to watch something fun or serious. The movies will be proceeded by 'Movies:' and the user preferences will be proceeded by 'Preferences:'. Also, within the Movies each movie will be separated by a '+' symbol and this will help you navigate the separate movies a bit easier. Based on the preferences, pick what movie fits best, and then provide a reasoning as to why they would like it."
+  }])
+
 
 
   //Function for retrieving vector embeddings and resettig state
@@ -97,17 +105,40 @@ function App() {
     const { data } = await supabase.rpc('match_movieapp', {
       query_embedding: actualEmbedding, 
       match_threshold: 0.5,
-      match_count: 3,
+      match_count: 5,
     })
 
-    console.log(data)
+    const holder = []
+
+    for (const movie of data){
+      holder.push(movie.content)
+    }
+    // console.log(holder)
     setMood(()=> "")
     setType(()=> "")
     setFavMovie(()=> "")
 
+    const movies = holder.join("+")
+    // console.log(movies)
+
+    chatMessages.push({role: "user", content: `Movies:${movies} Preferences:${input} `})
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: chatMessages,
+    })
+    
+    console.log(completion.choices[0].message.content)
 
 
   }
+
+
+
+
+
+
+
 
 
 
@@ -136,3 +167,8 @@ function App() {
 export default App
 
 
+
+
+//Mission impossible because its fun
+//Wanna watch something new
+//Wanna have fun
