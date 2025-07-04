@@ -32,12 +32,14 @@ function App() {
     })
 
     const movies = await textSplitter.createDocuments([data])
+    console.log("Here are the movies", movies)
 
     return movies
   }
 
   async function vectorEmbeddings(movies){
       movies.map( async(movie) =>{
+        console.log(movie)
         const embeddingResponse = await openai.embeddings.create({
           model: "text-embedding-ada-002",
           input: movie.pageContent
