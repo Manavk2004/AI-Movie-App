@@ -72,4 +72,49 @@ body{
   background-color: #51E08A;
   border-radius: 10px;
   margin-top: 10px;
+  cursor: pointer;
+}
+
+#main-page-response{
+  height: 800px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+#response{
+  height: 100%;
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 90px
+}
+#response > button{
+  width: 70%;
+  height: 70px;
+  font-family: Roboto Slab;
+  color: black;
+  font-size: 28px;
+  font-weight: bold;
+  background-color: #51E08A;
+  border-radius: 10px;
+  margin-top: 50px;
+  cursor: pointer;
+}
+
+p{
+  display: inline-block;
+  width: auto;
+  height: auto;
+  color: white;
+  font-family: Roboto Slab;
+  font-size: 14px;
+  line-height: 1.7
+}
+
+#movie-title{
+  color: white;
+  font-family: Roboto Slab
 }

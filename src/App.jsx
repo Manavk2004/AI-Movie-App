@@ -7,7 +7,9 @@ function App() {
   const [favMovie, setFavMovie] = useState("")
   const [mood, setMood] = useState("")
   const [type, setType] = useState("")
-
+  const [page, setPage] = useState(false)
+  const [response, setResponse] = useState("")
+  const [movieTitle, setMovieTitle] = useState("")
 
 
 
@@ -28,7 +30,13 @@ function App() {
   //   console.log(`Here is the type: ${type}`)
   // },[type])
 
+  // useEffect(()=>{
+  //   console.log(response)
+  // }, [response])
   
+  useEffect(()=>{
+    console.log(movieTitle)
+  }, [movieTitle])
 
 /*--------------------------------------------SEPARATION BETWEEN VECTOR EMBEDDINGS AND REST OF CODE------------------------------------------------------------------------------------------------------------*/
 
@@ -85,8 +93,8 @@ function App() {
 
   let chatMessages = ([{
     role: "system",
-    content: 
-      "You are an ethusiast of movies and your goal is to recommend the most similar movie based on the input given. You will be given several movies and their descriptions, and then the user inputs about what they favorite movie is, what they are in the modd for, and whether they want to watch something fun or serious. The movies will be proceeded by 'Movies:' and the user preferences will be proceeded by 'Preferences:'. Also, within the Movies each movie will be separated by a '+' symbol and this will help you navigate the separate movies a bit easier. Based on the preferences, pick what movie fits best, and then provide a reasoning as to why they would like it."
+    content: "You are an enthusiant in movies. I have developed a similarity vector and have retreived a movie accordingly based on the users inputs and preferences. The text you receive will actually container the users prefences and it will be followed after the phrase 'Preferences:'. I want you to explain why this film best suits their desires. Do not explicitly state their desires, and then explain how the movie meets it. Just be natural and make it flow well. Make it 3 sentences max, but make it brilliant"
+      
   }])
 
 
@@ -105,33 +113,44 @@ function App() {
     const { data } = await supabase.rpc('match_movieapp', {
       query_embedding: actualEmbedding, 
       match_threshold: 0.5,
-      match_count: 5,
+      match_count: 1,
     })
+
+    console.log(data)
 
     const holder = []
 
     for (const movie of data){
-      holder.push(movie.content)
+      if (!holder.includes(movie.content)){
+        holder.push(movie.content)
+      }
+      setMovieTitle(movie.content.slice(0, movie.content.indexOf(":")))
     }
-    // console.log(holder)
-    setMood(()=> "")
-    setType(()=> "")
-    setFavMovie(()=> "")
 
     const movies = holder.join("+")
     // console.log(movies)
 
     chatMessages.push({role: "user", content: `Movies:${movies} Preferences:${input} `})
+    console.log("Here are the chat messages", chatMessages[1].content)
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: chatMessages,
     })
-    
-    console.log(completion.choices[0].message.content)
 
+    setMood(()=> "")
+    setType(()=> "")
+    setFavMovie(()=> "")
+
+    console.log("Here is the completion", completion)
+    
+    setResponse(()=> completion.choices[0].message.content)
+
+    setPage(() => false)
 
   }
+
+  
 
 
 
@@ -144,22 +163,47 @@ function App() {
 
   return (
     <>
-      <div id="main-page" >
-        <div id="header-container">
-          <img src={popcorn}/>
-          <h1 id="title">PopChoice</h1>
-        </div>
+      {page &&
+        <div id="main-page" >
+          <div id="header-container">
+            <img src={popcorn}/>
+            <h1 id="title">PopChoice</h1>
+          </div>
 
-        <div id="questions">
-          <h4 className="questions">What's your favorite movie and why?</h4>
-          <textarea value={favMovie} onChange={(e)=>setFavMovie(e.target.value)} className="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>
-          <h4 className="questions">Are you in the mood for something new or classic?</h4>
-          <textarea value={mood} onChange={(e)=>setMood(e.target.value)} className="text-boxes" placeholder="Classic sounds good" rows="3" cols="50"></textarea>
-          <h4 className="questions">Do you wanna have fun or do you want something serious?</h4>
-          <textarea value={type} onChange={(e)=>setType(e.target.value)} className="text-boxes" placeholder="I wanna watch something serious" rows="3" cols="50"></textarea>
-          <button onClick={()=>inputEmbeddings([favMovie, mood, type])} id="front-page-button">Let's Go</button>
+          <div id="questions">
+            <h4 className="questions">What's your favorite movie and why?</h4>
+            <textarea value={favMovie} onChange={(e)=>setFavMovie(e.target.value)} className="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>
+            <h4 className="questions">Are you in the mood for something new or classic?</h4>
+            <textarea value={mood} onChange={(e)=>setMood(e.target.value)} className="text-boxes" placeholder="Classic sounds good" rows="3" cols="50"></textarea>
+            <h4 className="questions">Do you wanna have fun or do you want something serious?</h4>
+            <textarea value={type} onChange={(e)=>setType(e.target.value)} className="text-boxes" placeholder="I wanna watch something serious" rows="3" cols="50"></textarea>
+            <button onClick={()=>inputEmbeddings([favMovie, mood, type])} id="front-page-button">Let's Go</button>
+          </div>
         </div>
-      </div>
+      }
+
+      {!page &&
+        <>
+          <div id="main-page-response">
+            <div id="header-container">
+                <img src={popcorn}/>
+                <h1 id="title">PopChoice</h1>
+            </div>
+
+            <div id="response">
+              <h1 id="movie-title">{movieTitle}</h1>
+              <p>{response}</p>
+              <button onClick={(()=>setPage(true))}>Go Again</button>
+            </div>
+          </div>
+
+
+
+        </>
+
+      }
+
+
     </>
   )
 }
