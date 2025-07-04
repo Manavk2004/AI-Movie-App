@@ -14,7 +14,7 @@ function App() {
 
 
 
-  // //use effects for testing
+  //use effects for testing
 
   // useEffect(()=>{
   //   console.log(`Here is the favMovie: ${favMovie}`)
@@ -81,6 +81,10 @@ function App() {
 /*--------------------------------------------SEPARATION BETWEEN VECTOR EMBEDDINGS AND REST OF CODE------------------------------------------------------------------------------------------------------------*/
 
 
+
+
+  //Function for retrieving vector embeddings and resettig state
+
   async function inputEmbeddings(states){
     const input = states.join(",")
     const embedding = await openai.embeddings.create({
@@ -93,10 +97,16 @@ function App() {
     const { data } = await supabase.rpc('match_movieapp', {
       query_embedding: actualEmbedding, 
       match_threshold: 0.5,
-      match_count: 1,
+      match_count: 3,
     })
 
     console.log(data)
+    setMood(()=> "")
+    setType(()=> "")
+    setFavMovie(()=> "")
+
+
+
   }
 
 
@@ -111,11 +121,11 @@ function App() {
 
         <div id="questions">
           <h4 className="questions">What's your favorite movie and why?</h4>
-          <textarea onChange={(e)=>setFavMovie(e.target.value)} className="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>
+          <textarea value={favMovie} onChange={(e)=>setFavMovie(e.target.value)} className="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>
           <h4 className="questions">Are you in the mood for something new or classic?</h4>
-          <textarea onChange={(e)=>setMood(e.target.value)} className="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>
+          <textarea value={mood} onChange={(e)=>setMood(e.target.value)} className="text-boxes" placeholder="Classic sounds good" rows="3" cols="50"></textarea>
           <h4 className="questions">Do you wanna have fun or do you want something serious?</h4>
-          <textarea onChange={(e)=>setType(e.target.value)} className="text-boxes" placeholder="The Shawshank Redepmotion because it taught me to never give up hope no matter how hard life gets" rows="3" cols="50"></textarea>
+          <textarea value={type} onChange={(e)=>setType(e.target.value)} className="text-boxes" placeholder="I wanna watch something serious" rows="3" cols="50"></textarea>
           <button onClick={()=>inputEmbeddings([favMovie, mood, type])} id="front-page-button">Let's Go</button>
         </div>
       </div>
