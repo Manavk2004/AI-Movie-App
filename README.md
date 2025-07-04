@@ -1,4 +1,27 @@
-# React + Vite
+# AI Movie App (PopChoice)
+
+An AI-powered movie recommendation app built with React + Vite.
+
+## Setup
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+   - Copy `.env.example` to `.env`
+   - Add your API keys:
+     - `VITE_OPENAI_API_KEY`: Get from https://platform.openai.com/api-keys
+     - `VITE_SUPABASE_API_KEY`: Get from your Supabase project settings
+
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+## Tech Stack
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -10,4 +33,3 @@ Currently, two official plugins are available:
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# AI-Movie-App
